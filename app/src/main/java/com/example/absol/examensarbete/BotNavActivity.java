@@ -18,7 +18,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
     private static final String TAG = "BotNavActivity";
     private FloatingActionButton fab;
-    private Spinner spinner;
 
     FragmentFirst fragmentFirst;
     FragmentSecond fragmentSecond;
@@ -45,6 +44,12 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
     private void setupStuff() {
         fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragmentFirst.displayAddNameScreen();
+            }
+        });
 
     }
 
@@ -68,7 +73,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
                 appBarLayout.setExpanded(true);
                 fab.show();
-                //spinner.setVisibility(View.GONE);
                 return true;
 
             case R.id.navigation_second :
@@ -76,7 +80,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
                 fab.setVisibility(View.GONE);
                 appBarLayout.setExpanded(true);
-                //spinner.setVisibility(View.VISIBLE);
                 return true;
 
             case R.id.navigation_third :
@@ -84,7 +87,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
                 appBarLayout.setExpanded(true);
                 fab.setVisibility(View.GONE);
-                //spinner.setVisibility(View.GONE);
                 return true;
 
         }

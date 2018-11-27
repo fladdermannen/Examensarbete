@@ -35,14 +35,12 @@ public class InceptionFragmentSecond extends Fragment {
     private ArrayList<PopularNamePOJO> mArrayList = new ArrayList<>();
     private PopularNamesListAdapter mAdapter;
     RecyclerView mRecyclerView;
+    VolleyFetcher mVolley = new VolleyFetcher();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        VolleyFetcher mVolley = new VolleyFetcher();
-        String requestString = mVolley.makeRequestString(2017, "girls");
-        checkAPI(requestString);
     }
 
     @Nullable
@@ -61,6 +59,12 @@ public class InceptionFragmentSecond extends Fragment {
         return rootView;
     }
 
+    public void loadYearFromSpinner(int year) {
+        mArrayList.clear();
+        String requestString = mVolley.makeRequestString(year, "girls");
+        checkAPI(requestString);
+
+    }
 
     private void checkAPI(String requestString){
 
@@ -137,7 +141,7 @@ public class InceptionFragmentSecond extends Fragment {
         }
 
         Collections.sort(mArrayList);
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= mArrayList.size(); i++) {
             mArrayList.get(i-1).setRank(i);
         }
         Log.d(TAG, "convertJson: " + mArrayList.size());

@@ -2,6 +2,9 @@ package com.example.absol.examensarbete;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,14 +15,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyNamesAdapterListener {
 
@@ -28,9 +41,13 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     DatabaseHelper mDatabaseHelper;
 
     private ArrayList<String> mArrayList = new ArrayList<>();
+    private ArrayList<String> namesToDelete = new ArrayList<>();
     private MyNamesListAdapter mAdapter;
     RecyclerView mRecyclerView;
-
+    LinearLayoutManager mLayoutManager;
+    PopupWindow mPopupWindow;
+    EditText popupEditText;
+    Button popupButton;
 
     @Override
     public void onAttach(Context context) {
@@ -38,7 +55,13 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         mDatabaseHelper = new DatabaseHelper(context);
     }
 
-
+    @Override
+    public void onPause() {
+        if(namesToDelete.size() != 0)
+            deleteNamesFromDb(namesToDelete);
+        closeKeyboard();
+        super.onPause();
+    }
 
     @Nullable
     @Override
@@ -48,26 +71,11 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
         mAdapter = new MyNamesListAdapter(mArrayList, this);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator( new DefaultItemAnimator());
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        /*
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String newEntryName = editText.getText().toString();
-                if(editText.length() != 0){
-                    if(addData(newEntryName, "boy")) {
-                        editText.setText("");
-                        mArrayList.add(newEntryName);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                } else
-                    toastMessage("You must put something in the text field");
-            }
-        });
-        */
 
         //Handling swipe
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -77,7 +85,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             }
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                mAdapter.onItemRemove(viewHolder);
+                mAdapter.onItemRemove(viewHolder, mRecyclerView);
             }
         };
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
@@ -123,7 +131,6 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     }
 
 
-
     @Override
     public void onNameSelected(String name){
         Cursor data = mDatabaseHelper.getItemID(name); //The ID associated with that name
@@ -148,29 +155,46 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             toastMessage("No index associated with that name");
     }
 
-    @Override
-    public void onNameDeleted(String name) {
-        Cursor data = mDatabaseHelper.getItemID(name);
-        int itemID = -1;
-        while(data.moveToNext()) {
-            itemID = data.getInt(0);
-        }
-        if(itemID > -1){
-            Cursor indexData = mDatabaseHelper.getItemIndex(name);
-            int itemIndex = -1;
-            while(indexData.moveToNext()){
-                itemIndex = indexData.getInt(0);
+
+    public void deleteNamesFromDb(ArrayList<String> names) {
+        for (String name : names) {
+
+            Cursor data = mDatabaseHelper.getItemID(name);
+            int itemID = -1;
+            while (data.moveToNext()) {
+                itemID = data.getInt(0);
             }
-            if(itemIndex > -1) {
-                mDatabaseHelper.deleteName(itemID, name, itemIndex);
-                Log.d(TAG, "onNameDeleted: Deleted " + name + " from database.");
+            if (itemID > -1) {
+                Cursor indexData = mDatabaseHelper.getItemIndex(name);
+                int itemIndex = -1;
+                while (indexData.moveToNext()) {
+                    itemIndex = indexData.getInt(0);
+                }
+                if (itemIndex > -1) {
+                    mDatabaseHelper.deleteName(itemID, name, itemIndex);
+                    Log.d(TAG, "onNameDeleted: Deleted " + name + " from database.");
+                } else {
+                    toastMessage("Could not find item index");
+                }
             } else {
-                toastMessage("Could not find item index");
+                toastMessage("Something went wrong when deleting name");
             }
-        } else {
-            toastMessage("Something went wrong when deleting name");
         }
+        namesToDelete.clear();
     }
+
+
+    @Override
+    public void removeNameFromDelete(String name) {
+        namesToDelete.remove(name);
+    }
+
+
+    @Override
+    public void addNameToDelete(String name) {
+        namesToDelete.add(name);
+    }
+
 
     @Override
     public void onMove(int index, int direction) {
@@ -206,8 +230,67 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         while (data.moveToNext()) {
             otherNameIndex = data.getInt(0);
         }
+
         mDatabaseHelper.moveItems(otherNameIndex, thisNameIndex);
         mAdapter.notifyItemMoved(index, index+direction);
+        mLayoutManager.scrollToPositionWithOffset(mArrayList.indexOf(thisName), mRecyclerView.getHeight()/2);
     }
 
+
+    public void displayAddNameScreen() {
+
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View customView = inflater.inflate(R.layout.popup_layout,null);
+        popupEditText = customView.findViewById(R.id.et);
+        popupButton = customView.findViewById(R.id.btn);
+
+        //Force open keyboard :)
+        popupEditText.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+
+        popupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newEntryName = popupEditText.getText().toString();
+                if(popupEditText.length() != 0){
+                    if(addData(newEntryName, "boy")) {
+                        popupEditText.setText("");
+                        mArrayList.add(newEntryName);
+                        mAdapter.notifyDataSetChanged();
+                        mPopupWindow.dismiss();
+                    }
+                } else
+                    toastMessage("You must put something in the text field");
+            }
+        });
+
+        mPopupWindow = new PopupWindow(
+                customView,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        if(Build.VERSION.SDK_INT>=21){
+            mPopupWindow.setElevation(5.0f);
+        }
+
+        mPopupWindow.setAnimationStyle(R.style.popup_window_animation_addname);
+        mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.showAtLocation(mRecyclerView, Gravity.CENTER,0,0);
+
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                closeKeyboard();
+            }
+        });
+    }
+
+    private void closeKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
 }

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -33,9 +34,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class FragmentSecond extends Fragment {
+public class FragmentSecond extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private final static String TAG = "FragmentSecond";
+    InceptionFragmentFirst pojkarFragment = new InceptionFragmentFirst();
+    InceptionFragmentSecond flickorFragment = new InceptionFragmentSecond();
 
     Spinner spinner;
     @Override
@@ -51,22 +54,31 @@ public class FragmentSecond extends Fragment {
         ViewPager mViewPager = rootView.findViewById(R.id.viewPager);
 
         ViewPagerAdapter vpAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        vpAdapter.addFragment(new InceptionFragmentFirst(), "Pojkar");
-        vpAdapter.addFragment(new InceptionFragmentSecond(), "Flickor");
+        vpAdapter.addFragment(pojkarFragment, "Pojkar");
+        vpAdapter.addFragment(flickorFragment, "Flickor");
 
         spinner = rootView.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource
                 (getContext(), R.array.years, R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
 
-
         spinner.setAdapter(spinnerAdapter);
-
+        spinner.setOnItemSelectedListener(this);
 
         mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(vpAdapter);
         return rootView;
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int year = Integer.parseInt((String)parent.getItemAtPosition(position));
+        pojkarFragment.loadYearFromSpinner(year);
+        flickorFragment.loadYearFromSpinner(year);
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

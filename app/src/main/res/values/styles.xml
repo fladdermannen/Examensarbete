@@ -24,4 +24,14 @@
         <item name="android:textAlignment" tools:targetApi="jelly_bean_mr1">center</item>
     </style>
 
+    <style name="Theme.App.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/textColor</item>
+        <item name="colorControlActivated">@color/textColor</item>
+        <item name="colorControlHighlight">@color/textColor</item>
+    </style>
+
+    <style name="popup_window_animation_addname">
+        <item name="android:windowEnterAnimation">@anim/fade_in_animation</item>
+    </style>
+
 </resources>
