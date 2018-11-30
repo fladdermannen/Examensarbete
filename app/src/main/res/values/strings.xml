@@ -5,8 +5,8 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <string name="fragment_first_subtitle">Mina Namn</string>
-
+    <string name="fragment_first_title">Mina Namn</string>
+    <string name="fragment_second_title">Populära Namn</string>
 
 
     <string-array name="years">
@@ -31,4 +31,7 @@
         <item>1999</item>
         <item>1998</item>
     </string-array>
+
+
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vulputate ultricies ipsum, nec varius erat sodales vel. Suspendisse quis risus eget nibh lobortis sodales. Nunc ex ex, porta vitae magna a, tempor vulputate nunc. Duis faucibus, enim sagittis blandit feugiat, eros lectus imperdiet diam, vitae rutrum sapien quam id arcu. Nulla quis est bibendum, egestas velit ut, pellentesque augue. Praesent sed eros eget libero volutpat congue. Vivamus varius eu augue id luctus. Cras consectetur faucibus magna a vestibulum. Morbi non tortor quam. Praesent ut elit efficitur, consequat augue vitae, porta lectus.</string>
 </resources>

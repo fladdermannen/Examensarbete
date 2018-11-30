@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical">
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/gifview"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/giphy"
+        />
+
+    <TextView
+        android:id="@+id/tv_namn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:gravity="start|center_vertical"
+        android:drawablePadding="32dp"
+        android:drawableStart="@drawable/ic_male"
+        android:drawableLeft="@drawable/ic_male"
+        android:text="Namn"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_namnsdag"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:drawablePadding="32dp"
+        android:drawableStart="@drawable/ic_date"
+        android:drawableLeft="@drawable/ic_date"
+        android:gravity="start|center_vertical"
+        android:text="Namnsdag"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/grayish" />
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:padding="16dp"
+        android:gravity="start|center_vertical"
+        android:text="@string/lorem"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+</LinearLayout>

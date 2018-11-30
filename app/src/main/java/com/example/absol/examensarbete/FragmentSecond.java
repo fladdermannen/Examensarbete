@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class FragmentSecond extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -40,6 +41,7 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
     InceptionFragmentFirst pojkarFragment = new InceptionFragmentFirst();
     InceptionFragmentSecond flickorFragment = new InceptionFragmentSecond();
 
+    HashMap<String, String> namedays = new HashMap<>();
     Spinner spinner;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,11 +51,17 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        namedays = (HashMap<String, String>)getArguments().getSerializable("Hashmap");
+
         View rootView = inflater.inflate(R.layout.fragment_second, container, false);
         TabLayout mTabLayout = rootView.findViewById(R.id.tabLayout);
         ViewPager mViewPager = rootView.findViewById(R.id.viewPager);
 
         ViewPagerAdapter vpAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("Hashmap", namedays);
+        pojkarFragment.setArguments(bundle);
+        flickorFragment.setArguments(bundle);
         vpAdapter.addFragment(pojkarFragment, "Pojkar");
         vpAdapter.addFragment(flickorFragment, "Flickor");
 
@@ -81,4 +89,5 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
 }

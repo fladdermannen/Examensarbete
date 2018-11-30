@@ -7,13 +7,17 @@ import android.support.annotation.NonNull;
 public class PopularNamePOJO implements Comparable<PopularNamePOJO> , Parcelable {
 
     private String name;
+    private boolean isFemale;
     private int rank;
     private int amount;
+    private String nameday;
 
-    public PopularNamePOJO(String name, int amount){
+    public PopularNamePOJO(String name, int amount, boolean isFemale, String nameday){
         this.name = name;
         this.amount = amount;
         this.rank = 0;
+        this.isFemale = isFemale;
+        this.nameday = nameday;
     }
 
     public int getAmount() {
@@ -26,6 +30,18 @@ public class PopularNamePOJO implements Comparable<PopularNamePOJO> , Parcelable
 
     public String getName() {
         return name;
+    }
+
+    public boolean getFemale() {
+        return isFemale;
+    }
+
+    public String getNameday() {
+        return nameday;
+    }
+
+    public void setFemale(boolean female) {
+        isFemale = female;
     }
 
     public void setName(String name) {

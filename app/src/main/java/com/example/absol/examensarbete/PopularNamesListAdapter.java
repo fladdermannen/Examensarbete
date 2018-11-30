@@ -9,12 +9,19 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class PopularNamesListAdapter extends RecyclerView.Adapter<PopularNamesListAdapter.MyViewHolder> {
+public class PopularNamesListAdapter extends RecyclerView.Adapter<PopularNamesListAdapter.MyViewHolder>{
 
     private ArrayList<PopularNamePOJO> nameList;
+    private PopularNamesAdapterListener listener;
 
-    public PopularNamesListAdapter(ArrayList<PopularNamePOJO> arrayList){
+    public interface PopularNamesAdapterListener {
+        void onNameSelected(PopularNamePOJO name);
+    }
+
+
+    public PopularNamesListAdapter(ArrayList<PopularNamePOJO> arrayList, PopularNamesAdapterListener listener){
         this.nameList = arrayList;
+        this.listener = listener;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -26,6 +33,13 @@ public class PopularNamesListAdapter extends RecyclerView.Adapter<PopularNamesLi
             name = itemView.findViewById(R.id.textViewName);
             amount = itemView.findViewById(R.id.textViewAmount);
             rank = itemView.findViewById(R.id.textViewRank);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onNameSelected(nameList.get(getAdapterPosition()));
+                }
+            });
         }
     }
 

@@ -2,18 +2,27 @@ package com.example.absol.examensarbete;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,6 +40,9 @@ import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -38,16 +50,18 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
     private static final String TAG = "FragmentFirst";
 
+    HashMap<String, String> namedays = new HashMap<>();
     DatabaseHelper mDatabaseHelper;
 
     private ArrayList<String> mArrayList = new ArrayList<>();
-    private ArrayList<String> namesToDelete = new ArrayList<>();
     private MyNamesListAdapter mAdapter;
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     PopupWindow mPopupWindow;
     EditText popupEditText;
     Button popupButton;
+
+    boolean keyboardActive = false;
 
     @Override
     public void onAttach(Context context) {
@@ -57,15 +71,16 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
     @Override
     public void onPause() {
-        if(namesToDelete.size() != 0)
-            deleteNamesFromDb(namesToDelete);
-        closeKeyboard();
+        if(keyboardActive)
+            closeKeyboard();
         super.onPause();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        namedays = (HashMap<String, String>)getArguments().getSerializable("Hashmap");
+
         View rootView = inflater.inflate(R.layout.fragment_first, container, false);
         mRecyclerView = rootView.findViewById(R.id.myNamesRecyclerView);
 
@@ -77,17 +92,58 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
 
-        //Handling swipe
+        //Handling swipe and drag&drop
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
+                moveNamesInDB(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
             }
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 mAdapter.onItemRemove(viewHolder, mRecyclerView);
             }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                int swipeFlags = ItemTouchHelper.END;
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    // Get RecyclerView item from the ViewHolder
+                    View itemView = viewHolder.itemView;
+
+                    new RecyclerViewSwipeDecorator.Builder(getContext(), c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                            .addBackgroundColor(ContextCompat.getColor(getContext(), R.color.red))
+                            .addActionIcon(R.drawable.ic_delete)
+                            .create()
+                            .decorate();
+
+
+                    //Fade out name
+                    final float alpha = 1.0f - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
+                    viewHolder.itemView.setAlpha(alpha);
+                    viewHolder.itemView.setTranslationX(dX);
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+
         };
+
+
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
 
 
@@ -153,12 +209,22 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             Log.d(TAG, "onNameSelected: The Index of name " + name + " is " + itemID);
         } else
             toastMessage("No index associated with that name");
+
+
+        if(namedays.get(name) != null) {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name, "Namnsdag:  " + namedays.get(name), "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        } else {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name, "Ingen namnsdag", "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        }
+
     }
 
 
-    public void deleteNamesFromDb(ArrayList<String> names) {
-        for (String name : names) {
-
+    public void deleteNamesFromDb(String name) {
             Cursor data = mDatabaseHelper.getItemID(name);
             int itemID = -1;
             while (data.moveToNext()) {
@@ -179,48 +245,20 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             } else {
                 toastMessage("Something went wrong when deleting name");
             }
-        }
-        namesToDelete.clear();
+    }
+
+    @Override
+    public void deleteName(String name) {
+        deleteNamesFromDb(name);
     }
 
 
-    @Override
-    public void removeNameFromDelete(String name) {
-        namesToDelete.remove(name);
-    }
+    public void moveNamesInDB(int index, int target) {
 
-
-    @Override
-    public void addNameToDelete(String name) {
-        namesToDelete.add(name);
-    }
-
-
-    @Override
-    public void onMove(int index, int direction) {
         String thisName = mArrayList.get(index);
-        String otherName = "";
+        String otherName = mArrayList.get(target);
         int thisNameIndex = -1;
         int otherNameIndex = -1;
-
-        //Moving UP
-        if(direction<0) {
-            if (index == 0) {
-                return;
-            }
-            otherName = mArrayList.get(index - 1);
-            String item = mArrayList.remove(index);
-            mArrayList.add(index - 1, item);
-
-        //Moving DOWN
-        }else if(direction>0) {
-            if(index == mArrayList.size()-1) {
-                return;
-            }
-            otherName = mArrayList.get(index + 1);
-            String item = mArrayList.remove(index);
-            mArrayList.add(index + 1, item);
-        }
 
         Cursor data = mDatabaseHelper.getItemIndex(thisName);
         while (data.moveToNext()) {
@@ -231,9 +269,9 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             otherNameIndex = data.getInt(0);
         }
 
-        mDatabaseHelper.moveItems(otherNameIndex, thisNameIndex);
-        mAdapter.notifyItemMoved(index, index+direction);
-        mLayoutManager.scrollToPositionWithOffset(mArrayList.indexOf(thisName), mRecyclerView.getHeight()/2);
+        if(thisNameIndex > -1 && otherNameIndex > -1)
+            mDatabaseHelper.moveItems(thisNameIndex, otherNameIndex);
+        //mLayoutManager.scrollToPositionWithOffset(mArrayList.indexOf(thisName), mRecyclerView.getHeight()/2);
     }
 
 
@@ -248,6 +286,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         popupEditText.requestFocus();
         InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        keyboardActive = true;
 
 
         popupButton.setOnClickListener(new View.OnClickListener() {
@@ -273,11 +312,11 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         );
 
         if(Build.VERSION.SDK_INT>=21){
-            mPopupWindow.setElevation(5.0f);
+            mPopupWindow.setElevation(20.0f);
         }
 
         mPopupWindow.setAnimationStyle(R.style.popup_window_animation_addname);
-        mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mPopupWindow.setFocusable(true);
         mPopupWindow.showAtLocation(mRecyclerView, Gravity.CENTER,0,0);
 
@@ -292,5 +331,6 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     private void closeKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        keyboardActive = false;
     }
 }

@@ -89,14 +89,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL0 + " = '" + id + "'" + " AND " +
                 COL2 + " = '" + name + "'";
         db.execSQL(query);
-        query = "UPDATE " + TABLE_NAME + " SET " + COL3 + " = " +
+        updateIndexAfterDelete(itemIndex);
+    }
+
+    void updateIndexAfterDelete(int itemIndex) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_NAME + " SET " + COL3 + " = " +
                 COL3 + "-1 " + "WHERE " + COL3 + " > " + itemIndex;
 
         db.execSQL(query);
     }
 
-    void moveItems(int newPosition, int currentPosition) {
-        Log.d(TAG, "moveItems: " +newPosition + " " + currentPosition);
+    void moveItems(int currentPosition, int newPosition) {
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         String query = "UPDATE " + TABLE_NAME + " SET " + COL3 + " = CASE "+

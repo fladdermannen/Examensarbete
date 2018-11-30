@@ -27,16 +27,19 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
-public class InceptionFragmentFirst extends Fragment {
+public class InceptionFragmentFirst extends Fragment implements PopularNamesListAdapter.PopularNamesAdapterListener {
 
     private static final String TAG = "InceptionFragmentFirst";
 
     private ArrayList<PopularNamePOJO> mArrayList = new ArrayList<>();
     private PopularNamesListAdapter mAdapter;
+
     RecyclerView mRecyclerView;
     VolleyFetcher mVolley = new VolleyFetcher();
 
+    HashMap<String, String> namedays = new HashMap<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,14 +47,14 @@ public class InceptionFragmentFirst extends Fragment {
     }
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        namedays = (HashMap<String, String>)getArguments().getSerializable("Hashmap");
         View rootView = inflater.inflate(R.layout.inception_fragment_first, container, false);
         mRecyclerView = rootView.findViewById(R.id.popNamesRecyclerViewBoys);
 
-        mAdapter = new PopularNamesListAdapter(mArrayList);
+        mAdapter = new PopularNamesListAdapter(mArrayList, this);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator( new DefaultItemAnimator());
@@ -132,7 +135,7 @@ public class InceptionFragmentFirst extends Fragment {
                     amount = amount.replace("]", "");
                     int parsedAmount = Integer.parseInt(amount);
 
-                    PopularNamePOJO newName = new PopularNamePOJO(name, parsedAmount);
+                    PopularNamePOJO newName = new PopularNamePOJO(name, parsedAmount, false, "test");
                     mArrayList.add(newName);
                 }
             } catch (JSONException e){
@@ -148,5 +151,17 @@ public class InceptionFragmentFirst extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onNameSelected(PopularNamePOJO name) {
+        if(namedays.get(name.getName()) != null) {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        } else {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        }
+    }
 
 }

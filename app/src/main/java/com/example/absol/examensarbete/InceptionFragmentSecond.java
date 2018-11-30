@@ -27,15 +27,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
-public class InceptionFragmentSecond extends Fragment {
+public class InceptionFragmentSecond extends Fragment implements PopularNamesListAdapter.PopularNamesAdapterListener {
 
     private static final String TAG = "InceptionFragmentSecond";
 
     private ArrayList<PopularNamePOJO> mArrayList = new ArrayList<>();
     private PopularNamesListAdapter mAdapter;
+
     RecyclerView mRecyclerView;
     VolleyFetcher mVolley = new VolleyFetcher();
+
+    HashMap<String, String> namedays = new HashMap<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,11 +50,12 @@ public class InceptionFragmentSecond extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        namedays = (HashMap<String, String>)getArguments().getSerializable("Hashmap");
 
         View rootView = inflater.inflate(R.layout.inception_fragment_second, container, false);
         mRecyclerView = rootView.findViewById(R.id.popNamesRecyclerViewGirls);
 
-        mAdapter = new PopularNamesListAdapter(mArrayList);
+        mAdapter = new PopularNamesListAdapter(mArrayList, this);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator( new DefaultItemAnimator());
@@ -63,7 +68,6 @@ public class InceptionFragmentSecond extends Fragment {
         mArrayList.clear();
         String requestString = mVolley.makeRequestString(year, "girls");
         checkAPI(requestString);
-
     }
 
     private void checkAPI(String requestString){
@@ -132,7 +136,8 @@ public class InceptionFragmentSecond extends Fragment {
                     amount = amount.replace("]", "");
                     int parsedAmount = Integer.parseInt(amount);
 
-                    PopularNamePOJO newName = new PopularNamePOJO(name, parsedAmount);
+
+                    PopularNamePOJO newName = new PopularNamePOJO(name, parsedAmount, true, "test");
                     mArrayList.add(newName);
                 }
             } catch (JSONException e){
@@ -147,4 +152,18 @@ public class InceptionFragmentSecond extends Fragment {
         Log.d(TAG, "convertJson: " + mArrayList.size());
         mAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onNameSelected(PopularNamePOJO name) {
+        if(namedays.get(name.getName()) != null) {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        } else {
+            NameInfoBottomSheetDialogFragment bottomSheet =
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem");
+            bottomSheet.show(getFragmentManager(), "name_info_fragment");
+        }
+    }
+
 }
