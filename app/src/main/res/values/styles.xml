@@ -36,7 +36,7 @@
     </style>
 
     <style name="toolbar_title_theme">
-        <item name="android:textSize">36sp</item>
+        <item name="android:textSize">26sp</item>
     </style>
 
     <style name="AppTheme.AddNameBtn" parent="Widget.AppCompat.Button.Colored">

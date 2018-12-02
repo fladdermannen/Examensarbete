@@ -66,6 +66,7 @@ public class InceptionFragmentSecond extends Fragment implements PopularNamesLis
 
     public void loadYearFromSpinner(int year) {
         mArrayList.clear();
+        mAdapter.notifyDataSetChanged();
         String requestString = mVolley.makeRequestString(year, "girls");
         checkAPI(requestString);
     }
@@ -91,7 +92,6 @@ public class InceptionFragmentSecond extends Fragment implements PopularNamesLis
                     @Override
                     public void onResponse(JSONObject response) {
                         convertJson(response);
-                        mAdapter.notifyDataSetChanged();
                     }
                 },
                 new Response.ErrorListener() {

@@ -37,15 +37,13 @@
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appBarLayout2"
             android:layout_width="match_parent"
-            android:layout_height="140dp">
+            android:layout_height="wrap_content">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 app:title="@string/fragment_first_title"
                 app:titleTextColor="@color/textColor"
                 app:titleTextAppearance="@style/toolbar_title_theme"
-                app:titleMarginStart="16dp"
-                app:titleMarginTop="70dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_collapseMode="pin"
@@ -57,7 +55,6 @@
                     android:background="@drawable/ic_info"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_marginTop="85dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"

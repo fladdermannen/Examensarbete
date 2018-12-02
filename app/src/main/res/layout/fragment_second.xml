@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/lighterWhite">
 
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/spinner"
@@ -24,7 +25,8 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryLight"
+        android:background="@color/colorPrimary"
+        android:elevation="0dp"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/textColor"
         app:tabIndicatorHeight="4dp"

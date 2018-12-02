@@ -75,6 +75,7 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
     }
 
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter mAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
@@ -150,4 +151,5 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
         );
         requestQueue.add(jsonObjectRequest);
     }
+
 }

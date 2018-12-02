@@ -54,9 +54,13 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     DatabaseHelper mDatabaseHelper;
 
     private ArrayList<String> mArrayList = new ArrayList<>();
+    private ArrayList<String> mLists = new ArrayList<>();
+
+    private CardViewAdapter mCardsAdapter;
     private MyNamesListAdapter mAdapter;
-    RecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
+
+    RecyclerView mRecyclerView, mCardsRecyclerView;
+    LinearLayoutManager mLayoutManager, cardsLayoutManager;
     PopupWindow mPopupWindow;
     EditText popupEditText;
     Button popupButton;
@@ -82,15 +86,21 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         namedays = (HashMap<String, String>)getArguments().getSerializable("Hashmap");
 
         View rootView = inflater.inflate(R.layout.fragment_first, container, false);
+        mCardsRecyclerView = rootView.findViewById(R.id.cardviewsRecyclerView);
         mRecyclerView = rootView.findViewById(R.id.myNamesRecyclerView);
 
+        mCardsAdapter = new CardViewAdapter(mLists);
         mAdapter = new MyNamesListAdapter(mArrayList, this);
+
+        cardsLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mCardsRecyclerView.setLayoutManager(cardsLayoutManager);
+        mCardsRecyclerView.setAdapter(mCardsAdapter);
 
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator( new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
+        mRecyclerView.setAdapter(mAdapter);
 
         //Handling swipe and drag&drop
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -146,8 +156,9 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
 
-
+        populateCardView();
         populateView();
+
         return rootView;
     }
 
@@ -159,7 +170,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         boolean insertData = mDatabaseHelper.addData(newEntryName, newEntryGender, index);
 
         if (insertData) {
-            toastMessage("Data successfully inserted!");
+            toastMessage("Data successfully inserted");
         }
         else {
             toastMessage("Something went wrong");
@@ -183,7 +194,29 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         }
 
         Log.d(TAG, "populateView: " + mArrayList.toString());
-        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void populateCardView() {
+        mLists.clear();
+
+        String hej = "1";
+        mLists.add(hej);
+
+        hej = "2";
+        mLists.add(hej);
+
+        hej = "3";
+        mLists.add(hej);
+
+        hej = "4";
+        mLists.add(hej);
+
+        hej = "5";
+        mLists.add(hej);
+
+        Log.d(TAG, "populateCardView: " + mLists.toString());
+        mCardsAdapter.notifyDataSetChanged();
     }
 
 
