@@ -1,9 +1,14 @@
 package com.example.absol.examensarbete;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,19 +19,28 @@ import android.widget.TextView;
 public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "NameInfoBottomSheetDial";
+    DatabaseHelper mDatabaseHelper;
     TextView namn, namnsdag, infotext;
+
+    View rootView;
 
     static String mName;
     static boolean isFemale;
     static String mNameday;
     static String mInfo;
     static boolean noGender = false;
+    static boolean showFab = false;
 
-    public static NameInfoBottomSheetDialogFragment newInstance(String name, boolean female, String nameday, String info) {
+    FloatingActionButton mFab;
+
+
+
+    public static NameInfoBottomSheetDialogFragment newInstance(String name, boolean female, String nameday, String info, boolean fab) {
         mName = name;
         isFemale = female;
         mNameday = nameday;
         mInfo = info;
+        showFab = fab;
 
         return new NameInfoBottomSheetDialogFragment();
     }
@@ -40,24 +54,42 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
         return new NameInfoBottomSheetDialogFragment();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mDatabaseHelper = new DatabaseHelper(getActivity(), "table_1");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.bottom_sheet_layout, container, false);
+        if(!showFab) {
+            rootView = inflater.inflate(R.layout.bottom_sheet_layout, container, false);
+        } else {
+            rootView = inflater.inflate(R.layout.bottom_sheet_layout_populars, container, false);
+            mFab = rootView.findViewById(R.id.fabAddName);
+            mFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addData(mName, "*");
+                }
+            });
+        }
 
         Log.d(TAG, "onCreateView: ");
-        namn = view.findViewById(R.id.tv_namn);
-        namnsdag = view.findViewById(R.id.tv_namnsdag);
-        infotext = view.findViewById(R.id.tv_info);
+        namn = rootView.findViewById(R.id.tv_namn);
+        namnsdag = rootView.findViewById(R.id.tv_namnsdag);
+        infotext = rootView.findViewById(R.id.tv_info);
 
         setupStuff();
-        return view;
+        return rootView;
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         noGender = false;
+        showFab = false;
     }
 
     public void setupStuff() {
@@ -69,6 +101,24 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
 
         if(noGender)
             namn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_favorite, 0, 0, 0);
+    }
+
+    public boolean addData(String newEntryName, String newEntryGender) {
+        Cursor data = mDatabaseHelper.getData();
+        int index = data.getCount() + 1;
+        boolean insertData = mDatabaseHelper.addData(newEntryName, newEntryGender, index);
+
+        if (insertData) {
+            Log.d(TAG, "addData: data successfully inserted");
+            Snackbar snackbar = Snackbar.make(rootView, newEntryName + " sparat.", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+        }
+        else {
+            Log.d(TAG, "addData: Something went wrong");
+            Snackbar snackbar = Snackbar.make(rootView, newEntryName + " finns redan sparat.", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+        }
+        return insertData;
     }
 
 

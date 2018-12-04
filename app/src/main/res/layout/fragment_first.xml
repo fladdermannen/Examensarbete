@@ -18,10 +18,11 @@
         android:layout_below="@id/tv_subtitle_lists"
         android:id="@+id/cardviewsRecyclerView"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="4dp">
     </android.support.v7.widget.RecyclerView>
+
 
     <TextView
         android:layout_below="@id/cardviewsRecyclerView"

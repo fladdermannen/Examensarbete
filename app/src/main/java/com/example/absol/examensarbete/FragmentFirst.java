@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -46,9 +47,11 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
-public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyNamesAdapterListener {
+public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyNamesAdapterListener, CardViewAdapter.CardViewAdapterListener {
 
     private static final String TAG = "FragmentFirst";
+
+    private String currentTable = "table_1";
 
     HashMap<String, String> namedays = new HashMap<>();
     DatabaseHelper mDatabaseHelper;
@@ -70,7 +73,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mDatabaseHelper = new DatabaseHelper(context);
+        mDatabaseHelper = new DatabaseHelper(context, currentTable);
     }
 
     @Override
@@ -89,7 +92,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         mCardsRecyclerView = rootView.findViewById(R.id.cardviewsRecyclerView);
         mRecyclerView = rootView.findViewById(R.id.myNamesRecyclerView);
 
-        mCardsAdapter = new CardViewAdapter(mLists);
+        mCardsAdapter = new CardViewAdapter(mLists, this);
         mAdapter = new MyNamesListAdapter(mArrayList, this);
 
         cardsLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -109,6 +112,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             public boolean isLongPressDragEnabled() {
                 return true;
             }
+
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -179,14 +183,12 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     }
 
 
-
     private void toastMessage(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
 
-
-    private void populateView(){
+    public void populateView(){
         mArrayList.clear();
         Cursor data = mDatabaseHelper.getData();
         while(data.moveToNext()) {
@@ -200,25 +202,20 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     public void populateCardView() {
         mLists.clear();
 
-        String hej = "1";
-        mLists.add(hej);
+        mLists.add("table_1");
 
-        hej = "2";
-        mLists.add(hej);
+        if(mDatabaseHelper.checkIfTableExists("table_2")) {
+            mLists.add("table_2");
+        }
+        if(mDatabaseHelper.checkIfTableExists("table_3")) {
+            mLists.add("table_3");
+        }
+        if(mDatabaseHelper.checkIfTableExists("table_4")) {
+            mLists.add("table_4");
+        }
 
-        hej = "3";
-        mLists.add(hej);
-
-        hej = "4";
-        mLists.add(hej);
-
-        hej = "5";
-        mLists.add(hej);
-
-        Log.d(TAG, "populateCardView: " + mLists.toString());
         mCardsAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public void onNameSelected(String name){
@@ -256,6 +253,67 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
     }
 
+    @Override
+    public void onNewListSelected() {
+
+        if(!mDatabaseHelper.checkIfTableExists("table_2")) {
+            mDatabaseHelper.createTable("table_2");
+            mLists.add("table_2");
+            populateCardView();
+            return;
+        }
+        if(!mDatabaseHelper.checkIfTableExists("table_3")) {
+            mDatabaseHelper.createTable("table_3");
+            mLists.add("table_3");
+            populateCardView();
+            return;
+        }
+        if(!mDatabaseHelper.checkIfTableExists("table_4")) {
+            mDatabaseHelper.createTable("table_4");
+            mLists.add("table_4");
+            populateCardView();
+        }
+
+    }
+
+    @Override
+    public void onCardSelected(int position) {
+        String table = mLists.get(position);
+        currentTable = table;
+        Log.d(TAG, "onCardSelected: " + table);
+        mDatabaseHelper.changeTable(table);
+        populateView();
+    }
+
+    @Override
+    public void onCardLongClick(final int position) {
+
+        if(position != 0) {
+            Snackbar snackbar = Snackbar.make(mRecyclerView, "RADERA LISTA?", Snackbar.LENGTH_LONG)
+                    .setAction("RADERA", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+
+                            String table = mLists.get(position);
+                            mDatabaseHelper.deleteTable(table);
+
+                            if (currentTable.equals(table)) {
+                                currentTable = "table_1";
+                                mDatabaseHelper.changeTable("table_1");
+                            }
+
+                            mCardsAdapter.notifyItemRemoved(position);
+                            populateCardView();
+                            populateView();
+
+
+                        }
+                    });
+            snackbar.show();
+        }
+
+    }
 
     public void deleteNamesFromDb(String name) {
             Cursor data = mDatabaseHelper.getItemID(name);

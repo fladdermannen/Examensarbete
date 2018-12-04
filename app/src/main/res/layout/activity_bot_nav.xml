@@ -73,7 +73,8 @@
             android:layout_height="wrap_content"
             app:layout_anchor="@id/scrollview"
             app:layout_anchorGravity="right|bottom"
-            android:layout_margin="16dp"/>
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add"/>
 
     </android.support.design.widget.CoordinatorLayout>
 

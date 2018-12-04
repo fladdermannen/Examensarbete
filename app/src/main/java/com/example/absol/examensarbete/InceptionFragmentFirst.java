@@ -1,5 +1,6 @@
 package com.example.absol.examensarbete;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -156,13 +156,15 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
     public void onNameSelected(PopularNamePOJO name) {
         if(namedays.get(name.getName()) != null) {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem");
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem", true);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         } else {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem");
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem", true);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         }
+
     }
+
 
 }

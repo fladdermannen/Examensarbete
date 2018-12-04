@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -157,11 +156,11 @@ public class InceptionFragmentSecond extends Fragment implements PopularNamesLis
     public void onNameSelected(PopularNamePOJO name) {
         if(namedays.get(name.getName()) != null) {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem");
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem", true);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         } else {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem");
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem", true);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         }
     }

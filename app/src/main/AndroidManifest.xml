@@ -14,7 +14,8 @@
 
         <activity
             android:name=".BotNavActivity"
-            android:label="@string/title_activity_bot_nav">
+            android:label="@string/title_activity_bot_nav"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

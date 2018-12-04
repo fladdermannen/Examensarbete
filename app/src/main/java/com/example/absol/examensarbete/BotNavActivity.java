@@ -102,6 +102,7 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
                 toolbarInfo.setVisibility(View.GONE);
                 appBarLayout.setExpanded(true);
                 fab.show();
+                fragmentFirst.populateView();
                 return true;
 
             case R.id.navigation_second :

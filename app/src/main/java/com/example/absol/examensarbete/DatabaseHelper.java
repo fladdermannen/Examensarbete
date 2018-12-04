@@ -11,14 +11,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
 
-    private static final String TABLE_NAME = "names_table";
+    private String TABLE_NAME;
     private static final String COL0 = "id";
     private static final String COL1 = "gender";
     private static final String COL2 = "name";
     private static final String COL3 = "mIndex";
 
-    DatabaseHelper(Context context) {
-        super(context, TABLE_NAME, null, 1);
+    DatabaseHelper(Context context, String tablename) {
+        super(context, tablename, null, 1);
+        this.TABLE_NAME = tablename;
     }
 
     @Override
@@ -113,4 +114,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(query);
     }
+
+    boolean checkIfTableExists (String tableName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
+
+    void createTable(String tableName) {
+        Log.d(TAG, "createTable: " + tableName);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String createTable = "CREATE TABLE " +tableName+ " ( " +COL0+ " INTEGER PRIMARY KEY, " +
+                COL1+ " TEXT, " +COL2+ " TEXT, " +COL3+ " TEXT)";
+        db.execSQL(createTable);
+    }
+
+    void changeTable(String tableName) {
+        this.TABLE_NAME = tableName;
+    }
+
+    void deleteTable(String tableName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("DROP TABLE IF EXISTS " + tableName);
+    }
+
 }
