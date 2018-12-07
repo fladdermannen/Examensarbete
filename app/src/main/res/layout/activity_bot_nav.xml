@@ -48,17 +48,8 @@
                 android:layout_height="match_parent"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-                <ImageButton
-                    android:id="@+id/toolbarInfo"
-                    android:background="@drawable/ic_info"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:visibility="gone"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:theme="@style/AppTheme.Toolbar">
 
             </android.support.v7.widget.Toolbar>
 

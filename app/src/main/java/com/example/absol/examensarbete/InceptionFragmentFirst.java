@@ -41,6 +41,8 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
 
     HashMap<String, String> namedays = new HashMap<>();
 
+    String currentTable;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,15 +158,21 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
     public void onNameSelected(PopularNamePOJO name) {
         if(namedays.get(name.getName()) != null) {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem", true);
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem", true, currentTable);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         } else {
             NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem", true);
+                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem", true, currentTable);
             bottomSheet.show(getFragmentManager(), "name_info_fragment");
         }
 
     }
 
+    public void filterList(String searchText) {
+        mAdapter.getFilter().filter(searchText);
+    }
 
+    public void setCurrentTable(String tableName) {
+        currentTable = tableName;
+    }
 }

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,17 +29,19 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
     static String mInfo;
     static boolean noGender = false;
     static boolean showFab = false;
+    static String currentTable;
 
     FloatingActionButton mFab;
 
 
 
-    public static NameInfoBottomSheetDialogFragment newInstance(String name, boolean female, String nameday, String info, boolean fab) {
+    public static NameInfoBottomSheetDialogFragment newInstance(String name, boolean female, String nameday, String info, boolean fab, String table) {
         mName = name;
         isFemale = female;
         mNameday = nameday;
         mInfo = info;
         showFab = fab;
+        currentTable = table;
 
         return new NameInfoBottomSheetDialogFragment();
     }
@@ -104,6 +105,7 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
     }
 
     public boolean addData(String newEntryName, String newEntryGender) {
+        mDatabaseHelper.changeTable(currentTable);
         Cursor data = mDatabaseHelper.getData();
         int index = data.getCount() + 1;
         boolean insertData = mDatabaseHelper.addData(newEntryName, newEntryGender, index);

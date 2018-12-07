@@ -4,18 +4,22 @@ package com.example.absol.examensarbete;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MyNamesListAdapter extends RecyclerView.Adapter<MyNamesListAdapter.MyViewHolder> {
+public class MyNamesListAdapter extends RecyclerView.Adapter<MyNamesListAdapter.MyViewHolder> implements Filterable {
 
     private static final String TAG = "MyNamesListAdapter";
     private ArrayList<String> nameList;
+    private ArrayList<String> nameListFull;
     private MyNamesAdapterListener listener;
 
     public interface MyNamesAdapterListener {
@@ -26,6 +30,7 @@ public class MyNamesListAdapter extends RecyclerView.Adapter<MyNamesListAdapter.
     MyNamesListAdapter(ArrayList<String> arrayList, MyNamesAdapterListener listener){
         this.nameList = arrayList;
         this.listener = listener;
+        this.nameListFull = arrayList;
         }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -77,7 +82,6 @@ public class MyNamesListAdapter extends RecyclerView.Adapter<MyNamesListAdapter.
         listener.deleteName(name);
     }
 
-
     boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
@@ -90,5 +94,44 @@ public class MyNamesListAdapter extends RecyclerView.Adapter<MyNamesListAdapter.
         }
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                Log.d(TAG, "performFiltering: " + charString);
+                if (charString.isEmpty()) {
+                    nameList = nameListFull;
+                } else {
+                    ArrayList<String> filteredList = new ArrayList<>();
+                    for (String row : nameListFull) {
+
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or phone number match
+                        if (row.toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    nameList = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = nameList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                nameList = (ArrayList<String>) filterResults.values;
+
+                // refresh the list with filtered data
+                notifyDataSetChanged();
+            }
+        };
     }
 }

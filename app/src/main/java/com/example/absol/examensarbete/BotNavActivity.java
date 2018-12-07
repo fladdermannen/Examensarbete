@@ -1,5 +1,6 @@
 package com.example.absol.examensarbete;
 
+import android.app.SearchManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -8,8 +9,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -40,7 +43,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
     NestedScrollView scrollView;
     AppBarLayout appBarLayout;
     Toolbar toolbar;
-    ImageButton toolbarInfo;
 
     public HashMap<String, String> nameDays = new HashMap<>();
     public NamedaySupplier namedaySupplier;
@@ -56,13 +58,14 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
         scrollView = findViewById(R.id.scrollview);
         appBarLayout = findViewById(R.id.appBarLayout2);
         toolbar = findViewById(R.id.toolbar);
-        toolbarInfo = findViewById(R.id.toolbarInfo);
 
+        setSupportActionBar(toolbar);
         setupStuff();
 
         namedaySupplier = new NamedaySupplier();
         getWiki();
     }
+
 
     private void setupStuff() {
         fab = findViewById(R.id.fab);
@@ -99,7 +102,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
                 viewPager.setCurrentItem(0);
 
                 toolbar.setTitle(R.string.fragment_first_title);
-                toolbarInfo.setVisibility(View.GONE);
                 appBarLayout.setExpanded(true);
                 fab.show();
                 fragmentFirst.populateView();
@@ -109,15 +111,14 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
                 viewPager.setCurrentItem(1);
 
                 toolbar.setTitle(R.string.fragment_second_title);
-                toolbarInfo.setVisibility(View.VISIBLE);
                 fab.hide();
                 appBarLayout.setExpanded(true);
+                fragmentSecond.setCurrentTable(fragmentFirst.getCurrentTable());
                 return true;
 
             case R.id.navigation_third :
                 viewPager.setCurrentItem(2);
 
-                toolbarInfo.setVisibility(View.GONE);
                 appBarLayout.setExpanded(true);
                 fab.hide();
                 return true;
@@ -139,7 +140,6 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
                     @Override
                     public void onResponse(JSONObject response) {
                         nameDays = namedaySupplier.parseWikitext(response);
-                        Log.d(TAG, "onResponse: "  +nameDays.get("Patrik"));
                         setupViewPager(viewPager);
                     }
                 },
@@ -152,5 +152,39 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
         );
         requestQueue.add(jsonObjectRequest);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        MenuItem mSearch = menu.findItem(R.id.action_search);
+        SearchView mSearchView = (SearchView) mSearch.getActionView();
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                int currentItemFragment = viewPager.getCurrentItem();
+                switch (currentItemFragment) {
+                    case (0) :
+                        fragmentFirst.filterNameList(newText);
+                        break;
+                    case (1) :
+                        fragmentSecond.filterNameList(newText);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+
+
 
 }

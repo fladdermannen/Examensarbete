@@ -58,7 +58,6 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
     private ArrayList<String> mArrayList = new ArrayList<>();
     private ArrayList<String> mLists = new ArrayList<>();
-
     private CardViewAdapter mCardsAdapter;
     private MyNamesListAdapter mAdapter;
 
@@ -69,6 +68,8 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
     Button popupButton;
 
     boolean keyboardActive = false;
+
+    private Bundle savedState = null;
 
     @Override
     public void onAttach(Context context) {
@@ -82,6 +83,7 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             closeKeyboard();
         super.onPause();
     }
+
 
     @Nullable
     @Override
@@ -104,6 +106,17 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         mRecyclerView.setItemAnimator( new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         mRecyclerView.setAdapter(mAdapter);
+
+        //Restore selected card from bundle
+        if(savedInstanceState != null && savedState == null) {
+            savedState = savedInstanceState.getBundle("mKey");
+            Log.d(TAG, "onCreateView: hello");
+        }
+        if(savedState != null) {
+            int cardPos = savedState.getInt("mKey");
+            mCardsAdapter.setSelectedPos(cardPos);
+        }
+        savedState = null;
 
         //Handling swipe and drag&drop
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -278,10 +291,15 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
 
     @Override
     public void onCardSelected(int position) {
+        mCardsAdapter.notifyItemChanged(mCardsAdapter.getSelectedPos());
+        mCardsAdapter.setSelectedPos(position);
+        mCardsAdapter.notifyItemChanged(position);
+
         String table = mLists.get(position);
         currentTable = table;
         Log.d(TAG, "onCardSelected: " + table);
         mDatabaseHelper.changeTable(table);
+
         populateView();
     }
 
@@ -301,6 +319,8 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
                             if (currentTable.equals(table)) {
                                 currentTable = "table_1";
                                 mDatabaseHelper.changeTable("table_1");
+                                mCardsAdapter.setSelectedPos(0);
+                                mCardsAdapter.notifyItemChanged(0);
                             }
 
                             mCardsAdapter.notifyItemRemoved(position);
@@ -313,6 +333,10 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
             snackbar.show();
         }
 
+    }
+
+    public String getCurrentTable() {
+        return currentTable;
     }
 
     public void deleteNamesFromDb(String name) {
@@ -423,5 +447,30 @@ public class FragmentFirst extends Fragment implements MyNamesListAdapter.MyName
         InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         keyboardActive = false;
+    }
+
+    public void filterNameList(String query) {
+        mAdapter.getFilter().filter(query);
+    }
+
+
+
+    //Save stuff in bundle (selected card)
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        savedState = saveState();
+    }
+
+    private Bundle saveState() {
+        Bundle state = new Bundle();
+        state.putInt("mKey", mCardsAdapter.getSelectedPos());
+        return state;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle("mKey", (savedState != null) ? savedState : saveState());
     }
 }

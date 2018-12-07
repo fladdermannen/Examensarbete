@@ -1,11 +1,13 @@
 package com.example.absol.examensarbete;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.DumbVi
 
     private ArrayList<String> mLists;
     private CardViewAdapterListener listener;
+
+    public int selectedPos = 0;
 
     public interface CardViewAdapterListener {
         void onCardSelected(int position);
@@ -32,13 +36,18 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.DumbVi
 
     class DumbViewHolder extends RecyclerView.ViewHolder {
 
-        Button button;
+        CardView cardView;
         ImageButton imageButton;
+        FrameLayout f1,f2,f3,f4;
 
         DumbViewHolder(View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.button);
+            cardView = itemView.findViewById(R.id.cardview_layout);
             imageButton = itemView.findViewById(R.id.imageButton);
+            f1 = itemView.findViewById(R.id.fl1);
+            f2 = itemView.findViewById(R.id.fl2);
+            f3 = itemView.findViewById(R.id.fl3);
+            f4 = itemView.findViewById(R.id.fl4);
         }
     }
 
@@ -65,14 +74,22 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.DumbVi
                 }
             });
         } else {
+            int notSelected = Color.parseColor("#ffffff");
+            int selected = Color.parseColor("#d50000");
+
+            holder.f1.setBackgroundColor(selectedPos == position ? selected : notSelected);
+            holder.f2.setBackgroundColor(selectedPos == position ? selected : notSelected);
+            holder.f3.setBackgroundColor(selectedPos == position ? selected : notSelected);
+            holder.f4.setBackgroundColor(selectedPos == position ? selected : notSelected);
+
             final int pos = position;
-            holder.button.setOnClickListener(new View.OnClickListener() {
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onCardSelected(pos);
                 }
             });
-            holder.button.setOnLongClickListener(new View.OnLongClickListener() {
+            holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     listener.onCardLongClick(pos);
@@ -80,6 +97,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.DumbVi
                 }
             });
         }
+
+
     }
 
     @Override
@@ -91,6 +110,14 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.DumbVi
     @Override
     public int getItemCount() {
         return mLists.size() +1;
+    }
+
+    public void setSelectedPos(int pos) {
+        selectedPos = pos;
+    }
+
+    public int getSelectedPos() {
+        return selectedPos;
     }
 
 }

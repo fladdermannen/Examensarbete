@@ -13,6 +13,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,6 +46,8 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
 
     HashMap<String, String> namedays = new HashMap<>();
     Spinner spinner;
+    ViewPager mViewPager;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +60,7 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
 
         View rootView = inflater.inflate(R.layout.fragment_second, container, false);
         TabLayout mTabLayout = rootView.findViewById(R.id.tabLayout);
-        ViewPager mViewPager = rootView.findViewById(R.id.viewPager);
+        mViewPager = rootView.findViewById(R.id.viewPager);
 
         ViewPagerAdapter vpAdapter = new ViewPagerAdapter(getChildFragmentManager());
         Bundle bundle = new Bundle();
@@ -88,6 +93,16 @@ public class FragmentSecond extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public void filterNameList(String searchText) {
+        pojkarFragment.filterList(searchText);
+        flickorFragment.filterList(searchText);
+    }
+
+    public void setCurrentTable(String tableName) {
+        pojkarFragment.setCurrentTable(tableName);
+        flickorFragment.setCurrentTable(tableName);
     }
 
 }
