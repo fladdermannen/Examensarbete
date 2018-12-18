@@ -1,11 +1,9 @@
 package com.example.absol.examensarbete;
 
-import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class NamedaySupplier {

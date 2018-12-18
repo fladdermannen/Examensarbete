@@ -62,7 +62,7 @@ public class PopularNamesListAdapter extends RecyclerView.Adapter<PopularNamesLi
     public void onBindViewHolder(@NonNull PopularNamesListAdapter.MyViewHolder holder, int position) {
         PopularNamePOJO popName = nameList.get(position);
         holder.name.setText(popName.getName());
-        holder.amount.setText("Antal: " + popName.getAmount());
+        holder.amount.setText("" + popName.getAmount());
         holder.rank.setText("" + popName.getRank());
     }
 

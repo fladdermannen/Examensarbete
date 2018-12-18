@@ -4,16 +4,17 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_search"
         android:title="search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom|collapseActionView"
         />
 
     <item
         android:id="@+id/action_info"
         android:icon="@drawable/ic_info"
         android:title="info"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        android:visible="false"/>
 
 </menu>

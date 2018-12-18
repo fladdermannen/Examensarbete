@@ -1,12 +1,24 @@
 <resources>
     <string name="app_name">Examensarbete</string>
     <string name="title_activity_bot_nav">BotNavActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_home">Sparade</string>
+    <string name="title_dashboard">Populära</string>
     <string name="title_notifications">Notifications</string>
 
-    <string name="fragment_first_title">Mina Namn</string>
-    <string name="fragment_second_title">Populära Namn</string>
+    <string name="fragment_first_title">Sparade</string>
+    <string name="fragment_second_title">Populära</string>
+
+    <string name="usualnames">Vanliga Namn</string>
+    <string name="infoText">Den här listan innehåller de 100 vanligaste tilltalsnamnen på nyfödda i Sverige efter namngivningsår, från år 1998 till 2017.</string>
+    <string name="infoText2">Listan är sorterad efter antal bärare. </string>
+    <string name="infoText3">Informationen hämtas direkt från Statistiska centralbyrån.</string>
+    <string name="infoTextWiki">Informationen hämtas direkt från wikipedia.org</string>
+
+    <string name="minaListor">Mina listor</string>
+    <string name="minaNamn">Namn</string>
+    <string name="namn">Namn</string>
+    <string name="antal">Antal</string>
+    <string name="placeholder">*</string>
 
 
     <string-array name="years">

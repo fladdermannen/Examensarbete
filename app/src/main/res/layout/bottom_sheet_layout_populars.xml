@@ -30,9 +30,9 @@
         android:drawablePadding="32dp"
         android:drawableStart="@drawable/ic_male"
         android:drawableLeft="@drawable/ic_male"
-        android:text="Namn"
+        android:text="@string/placeholder"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/tv_namnsdag"
@@ -44,7 +44,7 @@
         android:drawableStart="@drawable/ic_date"
         android:drawableLeft="@drawable/ic_date"
         android:gravity="start|center_vertical"
-        android:text="Namnsdag"
+        android:text="@string/placeholder"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -68,6 +68,19 @@
         android:text="@string/lorem"
         android:textColor="@color/black"
         android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_info2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:padding="16dp"
+            android:gravity="end|center_vertical"
+            android:text="@string/infoTextWiki"
+            android:textColor="@color/black"
+            android:textStyle="italic"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton

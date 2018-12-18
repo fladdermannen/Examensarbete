@@ -41,6 +41,7 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
 
     HashMap<String, String> namedays = new HashMap<>();
 
+    String mName;
     String currentTable;
 
     @Override
@@ -156,16 +157,7 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
 
     @Override
     public void onNameSelected(PopularNamePOJO name) {
-        if(namedays.get(name.getName()) != null) {
-            NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "lorem", true, currentTable);
-            bottomSheet.show(getFragmentManager(), "name_info_fragment");
-        } else {
-            NameInfoBottomSheetDialogFragment bottomSheet =
-                    NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "lorem", true, currentTable);
-            bottomSheet.show(getFragmentManager(), "name_info_fragment");
-        }
-
+        getWikiNameInfo(name, name.getName());
     }
 
     public void filterList(String searchText) {
@@ -174,5 +166,134 @@ public class InceptionFragmentFirst extends Fragment implements PopularNamesList
 
     public void setCurrentTable(String tableName) {
         currentTable = tableName;
+    }
+
+
+
+    private void getWikiNameInfo(final PopularNamePOJO pojo, String name) {
+        mName = name;
+
+        //Handle known exceptions
+        switch (name) {
+            case ("Leo") :
+                name = name + "_(förnamn)";
+                break;
+            case ("Charlie") :
+                name = "Karl";
+                break;
+            case ("Sam") :
+                name = "Samuel_(namn)";
+                break;
+            case ("Samuel") :
+                name = name + "_(namn)";
+                break;
+            case ("Alex") :
+                name = "Alexander";
+                break;
+            case ("Eddie") :
+                name = name + "_(namn)";
+                break;
+            case ("Björn") :
+                name = name + "_(namn)";
+                break;
+        }
+        String mURL = "https://sv.wikipedia.org/api/rest_v1/page/summary/" + name;
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                mURL,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String feedback = convertWikiJson(response, mName, pojo);
+
+                        if(mName.contains("_")) {
+                            mName = mName.replace("_(namn)", "");
+                        }
+
+                        if(feedback != null) {
+                            openBotSheet(pojo, feedback);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse: ", error);
+                        openBotSheet(pojo, null);
+                    }
+                }
+        );
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private String convertWikiJson(JSONObject json, String name, PopularNamePOJO pojo) {
+
+        String type = "";
+        //Grab data from response
+        try{
+            type = json.getString("type");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, "convertJson: " + type + name);
+
+        //Some names listed as disambiguation when they shouldn't be. Return their info anyway
+        if(name.equals("Samuel") || name.equals("Daniel") || name.equals("Robert") || name.equals("Eddie") || name.equals("Magnus")) {
+            String extract = "";
+            try{
+                extract = json.getString("extract");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return extract;
+        }
+        else if(type.equals("disambiguation")) {
+            //Disambiguation found, force name page
+            getWikiNameInfo(pojo,name + "_(namn)");
+            return null;
+        } else if(type.equals("https://mediawiki.org/wiki/HyperSwitch/errors/not_found")) {
+            //Name not found
+            return null;
+        } else if(type.equals("standard")) {
+            //Name found, return info
+            String extract = "";
+            try{
+                extract = json.getString("extract");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return extract;
+        } else
+
+
+        return null;
+    }
+
+    private void openBotSheet(PopularNamePOJO name, String info) {
+        if(info != null) {
+            if(namedays.get(name.getName()) != null) {
+                NameInfoBottomSheetDialogFragment bottomSheet =
+                        NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), info, true, currentTable);
+                bottomSheet.show(getFragmentManager(), "name_info_fragment");
+            } else {
+                NameInfoBottomSheetDialogFragment bottomSheet =
+                        NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", info, true, currentTable);
+                bottomSheet.show(getFragmentManager(), "name_info_fragment");
+            }
+        } else {
+            if(namedays.get(name.getName()) != null) {
+                NameInfoBottomSheetDialogFragment bottomSheet =
+                        NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Namnsdag:  " + namedays.get(name.getName()), "Ingen information tillgänglig.", true, currentTable);
+                bottomSheet.show(getFragmentManager(), "name_info_fragment");
+            } else {
+                NameInfoBottomSheetDialogFragment bottomSheet =
+                        NameInfoBottomSheetDialogFragment.newInstance(name.getName(), name.getFemale(), "Ingen namnsdag", "Ingen information tillgänglig.", true, currentTable);
+                bottomSheet.show(getFragmentManager(), "name_info_fragment");
+            }
+        }
     }
 }

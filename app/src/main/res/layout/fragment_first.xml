@@ -12,33 +12,33 @@
         android:layout_marginTop="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:text="Mina listor"/>
+        android:text="@string/minaListor"
+        android:textSize="16sp" />
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@id/tv_subtitle_lists"
         android:id="@+id/cardviewsRecyclerView"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="4dp">
+        android:layout_height="wrap_content">
     </android.support.v7.widget.RecyclerView>
 
 
-    <TextView
+    <LinearLayout
+        android:layout_marginTop="4dp"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:background="@color/colorPrimary"
         android:layout_below="@id/cardviewsRecyclerView"
-        android:id="@+id/tv_subtitle_names"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Namn"
-        />
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:background="@color/textColor"
-        android:layout_below="@id/tv_subtitle_names"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_below="@id/ll"
         android:id="@+id/myNamesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

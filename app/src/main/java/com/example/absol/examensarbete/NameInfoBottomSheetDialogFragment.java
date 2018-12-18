@@ -55,6 +55,12 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
         return new NameInfoBottomSheetDialogFragment();
     }
 
+    public static NameInfoBottomSheetDialogFragment newInstance() {
+
+        mName = null;
+        return new NameInfoBottomSheetDialogFragment();
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -64,8 +70,10 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(!showFab) {
+        if(!showFab && mName != null) {
             rootView = inflater.inflate(R.layout.bottom_sheet_layout, container, false);
+        } else if(mName == null) {
+            rootView = inflater.inflate(R.layout.bottom_sheet_layout_info, container, false);
         } else {
             rootView = inflater.inflate(R.layout.bottom_sheet_layout_populars, container, false);
             mFab = rootView.findViewById(R.id.fabAddName);
@@ -77,12 +85,14 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
             });
         }
 
-        Log.d(TAG, "onCreateView: ");
-        namn = rootView.findViewById(R.id.tv_namn);
-        namnsdag = rootView.findViewById(R.id.tv_namnsdag);
-        infotext = rootView.findViewById(R.id.tv_info);
+        if(mName != null) {
+            Log.d(TAG, "onCreateView: ");
+            namn = rootView.findViewById(R.id.tv_namn);
+            namnsdag = rootView.findViewById(R.id.tv_namnsdag);
+            infotext = rootView.findViewById(R.id.tv_info);
 
-        setupStuff();
+            setupStuff();
+        }
         return rootView;
     }
 
@@ -96,7 +106,7 @@ public class NameInfoBottomSheetDialogFragment extends BottomSheetDialogFragment
     public void setupStuff() {
         namn.setText(mName);
         namnsdag.setText(mNameday);
-        //infotext.setText(mInfo);
+        infotext.setText(mInfo);
         if(isFemale)
             namn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_female,0,0 ,0 );
 

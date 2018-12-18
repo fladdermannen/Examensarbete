@@ -1,6 +1,5 @@
 package com.example.absol.examensarbete;
 
-import android.app.SearchManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -15,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -43,6 +41,8 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
     NestedScrollView scrollView;
     AppBarLayout appBarLayout;
     Toolbar toolbar;
+    MenuItem infoBtn;
+    SearchView mSearchView;
 
     public HashMap<String, String> nameDays = new HashMap<>();
     public NamedaySupplier namedaySupplier;
@@ -101,17 +101,19 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
             case R.id.navigation_first :
                 viewPager.setCurrentItem(0);
 
-                toolbar.setTitle(R.string.fragment_first_title);
+                //toolbar.setTitle(R.string.fragment_first_title);
                 appBarLayout.setExpanded(true);
                 fab.show();
+                infoBtn.setVisible(false);
                 fragmentFirst.populateView();
                 return true;
 
             case R.id.navigation_second :
                 viewPager.setCurrentItem(1);
 
-                toolbar.setTitle(R.string.fragment_second_title);
+                //toolbar.setTitle(R.string.fragment_second_title);
                 fab.hide();
+                infoBtn.setVisible(true);
                 appBarLayout.setExpanded(true);
                 fragmentSecond.setCurrentTable(fragmentFirst.getCurrentTable());
                 return true;
@@ -121,6 +123,7 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
 
                 appBarLayout.setExpanded(true);
                 fab.hide();
+                infoBtn.setVisible(false);
                 return true;
 
         }
@@ -157,8 +160,10 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
 
+        infoBtn = menu.findItem(R.id.action_info);
+
         MenuItem mSearch = menu.findItem(R.id.action_search);
-        SearchView mSearchView = (SearchView) mSearch.getActionView();
+        mSearchView = (SearchView) mSearch.getActionView();
 
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -181,10 +186,23 @@ public class BotNavActivity extends AppCompatActivity implements BottomNavigatio
             }
         });
 
+        infoBtn.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                NameInfoBottomSheetDialogFragment infoFrag =
+                        NameInfoBottomSheetDialogFragment.newInstance();
+                infoFrag.show(getSupportFragmentManager(), "infoFrag");
+                return false;
+            }
+        });
+
         return true;
     }
 
-
-
-
+    @Override
+    public void onBackPressed() {
+        if (!mSearchView.isIconified()) {
+            mSearchView.setIconified(true);
+        }
+    }
 }
