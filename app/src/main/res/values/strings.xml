@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Examensarbete</string>
-    <string name="title_activity_bot_nav">BotNavActivity</string>
+    <string name="app_name">Bebisnamn</string>
+    <string name="title_activity_bot_nav">Bebisnamn</string>
     <string name="title_home">Sparade</string>
     <string name="title_dashboard">Populära</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">abc123???</string>
 
     <string name="fragment_first_title">Sparade</string>
     <string name="fragment_second_title">Populära</string>
